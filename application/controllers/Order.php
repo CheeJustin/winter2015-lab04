@@ -16,10 +16,22 @@ class Order extends Application {
     }
 
     // start a new order
-    function neworder() {
-        //FIXME
-
-        redirect('/order/display_menu/' . $order_num);
+    function neworder()
+    {
+        $order_num = $this->orders->highest() + 1;
+        
+        date_default_timezone_set("America/Vancouver");
+        
+        $newOrder = $this->orders->create();
+        $newOrder->num = $order_num;
+        $newOrder->date = date("Y/m/d/H/i/s");
+        $newOrder->status = "a";
+        $newOrder->total = 0;
+        
+        $this->orders->add($newOrder);
+        
+        $this->display_menu($order_num);
+        //redirect('./order/display_menu/' . $order_num);
     }
 
     // add to an order
@@ -29,26 +41,34 @@ class Order extends Application {
 
         $this->data['pagebody'] = 'show_menu';
         $this->data['order_num'] = $order_num;
-        //FIXME
+        $this->data['title'] = "Order: #" . $order_num . " || Total: " . $this->orders->get($order_num)->total;
 
         // Make the columns
         $this->data['meals'] = $this->make_column('m');
         $this->data['drinks'] = $this->make_column('d');
         $this->data['sweets'] = $this->make_column('s');
 
+        $items = $this->orderitems->some('order', 1);
+        $items2 = $items[0]->item;
+        echo var_dump($items2);
+        
         $this->render();
     }
 
     // make a menu ordering column
-    function make_column($category) {
-        //FIXME
-        return $items;
+    function make_column($category)
+    {
+        return $this->menu->some('category', $category);
     }
 
     // add an item to an order
     function add($order_num, $item) {
-        //FIXME
-        redirect('/order/display_menu/' . $order_num);
+        //$record = $this->orders->get($order_num);
+        //$record->total .= $item->price;
+        //$this->orders->update($record);
+        //$record->add_item($order_num, $item);
+        $this->orders->add_item($order_num, $item);
+        //redirect('/order/display_menu/' . $order_num);
     }
 
     // checkout
