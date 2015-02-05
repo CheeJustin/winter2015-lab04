@@ -90,7 +90,7 @@ class Order extends Application {
         $this->data['title'] = 'Checking Out';
         $this->data['pagebody'] = 'show_order';
         $this->data['order_num'] = $order_num;
-        $this->data['total'] = $this->orders->get($order_num)->total;
+        $this->data['total'] = "$" . $this->orders->get($order_num)->total;
         $this->data['items'] = $this->orders->details($order_num);
         
         $this->render();
@@ -100,8 +100,6 @@ class Order extends Application {
     function proceed($order_num)
     {
         $this->orders->complete($order_num);
-        //$this->data['pagebody'] = 'welcome';
-        //$this->render();
         header('Location: ../../');
     }
 

@@ -40,7 +40,6 @@ class Orders extends MY_Model {
         $total = 0;
         $items = $this->orderitems->some('order', $num);
         
-        //var_dump($items);
         foreach ($items as $item)
         {
             $itemPrice = $this->menu->get($item->item)->price;
@@ -49,7 +48,6 @@ class Orders extends MY_Model {
             $total += $itemQuantity * $itemPrice;
         }
         
-        //var_dump($total);
         $order = $this->orders->get($num);
         $order->total = $total;
         $this->orders->update($order);
@@ -59,7 +57,15 @@ class Orders extends MY_Model {
 
     // retrieve the details for an order
     function details($num) {
-        return $this->orderitems->some('order', $num);
+        $items = $this->orderitems->some('order', $num);
+        foreach ($items as $item)
+        {
+            $item->price = "$" . $this->menu->get($item->item)->price;
+            $item->name = $this->menu->get($item->item)->name;
+        }
+        
+        
+        return $items;
     }
 
     // cancel an order
