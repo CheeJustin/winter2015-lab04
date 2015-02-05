@@ -34,7 +34,8 @@ class Orders extends MY_Model {
     }
 
     // calculate the total for an order
-    function total($num) {
+    function total($num)
+    {
         // Get all the items(rows) that are linked to this order
         $total = 0;
         $items = $this->orderitems->some('order', $num);
@@ -58,18 +59,58 @@ class Orders extends MY_Model {
 
     // retrieve the details for an order
     function details($num) {
-        
+        return $this->orderitems->some('order', $num);
     }
 
     // cancel an order
-    function flush($num) {
-        
+    function flush($num)
+    {
+        $this->orderitems->delete_some($num);
+        $record = $this->orders->get($num);
+        $record->status = 'x';
+        $record->total = 0;
+        $this->orders->update($record);
     }
 
     // validate an order
     // it must have at least one item from each category
-    function validate($num) {
+    function validate($num)
+    {
+        $items = $this->orderitems->some('order', $num);
+        
+        $meal = false;
+        $drink = false;
+        $snack = false;
+        
+        foreach ($items as $item)
+        {
+            switch($this->menu->some('code', $item->item)[0]->category)
+            {
+                case 'm':
+                    $meal = true;
+                    break;
+                case 'd':
+                    $drink = true;
+                    break;
+                case 's':
+                    $snack = true;
+                    break;
+            }
+            
+            if ($meal && $drink && $snack)
+                return true;
+        }
+        
         return false;
+    }
+    
+    function complete($num)
+    {
+        $record = $this->orders->get($num);
+        $record->date = date("Y/m/d/H/i/s");
+        $record->status = 'c';
+        
+        $this->orders->update($record);
     }
 
 }

@@ -1,6 +1,7 @@
 <p class="lead">
     Click on a menu item below to add it to your order, or 
     <a href="/order/checkout/{order_num}" class="btn btn-primary">Checkout</a>
+    {warning}
 </p>
 
 <div class="row text-center">
