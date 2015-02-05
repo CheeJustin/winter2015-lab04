@@ -83,7 +83,7 @@ class Order extends Application {
         // If order is no valid, display a warning.
         if (!$this->orders->validate($order_num))
         {
-            $this->display_menu ($order_num, "Please select an item from each catagory");
+            $this->display_menu ($order_num, "Please select an item from each catagory before checkout.");
             return;
         }
         
@@ -100,16 +100,16 @@ class Order extends Application {
     function proceed($order_num)
     {
         $this->orders->complete($order_num);
-        $this->data['pagebody'] = 'welcome';
-        $this->render();
+        //$this->data['pagebody'] = 'welcome';
+        //$this->render();
+        header('Location: ../../');
     }
 
     // cancel the order
     function cancel($order_num)
     {
         $this->orders->flush($order_num);
-        $this->data['pagebody'] = 'welcome';
-        $this->render();
+        header('Location: ../../');
     }
 
 }
