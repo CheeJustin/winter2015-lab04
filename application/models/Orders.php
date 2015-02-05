@@ -13,28 +13,45 @@ class Orders extends MY_Model {
     }
 
     // add an item to an order
-    function add_item($num, $code) {
+    function add_item($num, $code)
+    {
+        
         if ($record = $this->orderitems->get($num, $code))
         {
-            $this->orderitems->update($record->quantity++);
+            $record->quantity++;
+            $this->orderitems->update($record);
         }
         else
         {
             $record = $this->orderitems->create();
-            $this->orderitems->update($record->quantity++);
+            $record->order = $num;
+            $record->item = $code;
+            $record->quantity = 1;
+            $this->orderitems->add($record);
         }
         
+        $this->total($num);
     }
 
     // calculate the total for an order
     function total($num) {
         // Get all the items(rows) that are linked to this order
         $total = 0;
-        $items = $this->orderitems->get('order', $num);
+        $items = $this->orderitems->some('order', $num);
+        
+        //var_dump($items);
         foreach ($items as $item)
         {
-            $total = $item['quantity'] * $item['price'];
+            $itemPrice = $this->menu->get($item->item)->price;
+            $itemQuantity = $item->quantity;
+            
+            $total += $itemQuantity * $itemPrice;
         }
+        
+        //var_dump($total);
+        $order = $this->orders->get($num);
+        $order->total = $total;
+        $this->orders->update($order);
         
         return $total;
     }

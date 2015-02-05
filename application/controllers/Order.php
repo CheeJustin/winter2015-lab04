@@ -31,7 +31,6 @@ class Order extends Application {
         $this->orders->add($newOrder);
         
         $this->display_menu($order_num);
-        //redirect('./order/display_menu/' . $order_num);
     }
 
     // add to an order
@@ -42,15 +41,24 @@ class Order extends Application {
         $this->data['pagebody'] = 'show_menu';
         $this->data['order_num'] = $order_num;
         $this->data['title'] = "Order: #" . $order_num . " || Total: " . $this->orders->get($order_num)->total;
-
+        
         // Make the columns
         $this->data['meals'] = $this->make_column('m');
         $this->data['drinks'] = $this->make_column('d');
         $this->data['sweets'] = $this->make_column('s');
-
-        $items = $this->orderitems->some('order', 1);
-        $items2 = $items[0]->item;
-        echo var_dump($items2);
+        
+        foreach ($this->data['meals'] as $meal)
+        {
+            $meal->order_num = $order_num;
+        }
+        foreach ($this->data['drinks'] as $meal)
+        {
+            $meal->order_num = $order_num;
+        }
+        foreach ($this->data['sweets'] as $meal)
+        {
+            $meal->order_num = $order_num;
+        }
         
         $this->render();
     }
@@ -62,17 +70,15 @@ class Order extends Application {
     }
 
     // add an item to an order
-    function add($order_num, $item) {
-        //$record = $this->orders->get($order_num);
-        //$record->total .= $item->price;
-        //$this->orders->update($record);
-        //$record->add_item($order_num, $item);
+    function add($order_num, $item)
+    {
         $this->orders->add_item($order_num, $item);
-        //redirect('/order/display_menu/' . $order_num);
+        $this->display_menu($order_num);
     }
 
     // checkout
-    function checkout($order_num) {
+    function checkout($order_num)
+    {
         $this->data['title'] = 'Checking Out';
         $this->data['pagebody'] = 'show_order';
         $this->data['order_num'] = $order_num;
